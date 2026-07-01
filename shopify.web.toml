@@ -1,7 +1,6 @@
 name = "React Router"
 roles = ["frontend", "backend"]
-webhooks_path = "/webhooks/app/uninstalled"
+webhooks_path = "/webhooks"
 
 [commands]
-predev = "npx prisma generate"
-dev = "npx prisma migrate deploy && npm exec react-router dev"
+dev = "npm exec react-router dev"

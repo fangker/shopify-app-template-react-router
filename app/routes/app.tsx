@@ -1,36 +1,178 @@
-import type { HeadersFunction, LoaderFunctionArgs } from "react-router";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import type { LoaderFunctionArgs } from "react-router";
 import { Outlet, useLoaderData, useRouteError } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
 
-import { authenticate } from "../shopify.server";
+import { apiKey } from "../shopify.server";
+import {
+  clearToken,
+  exchangeSessionToken,
+  getToken,
+} from "../lib/laravel-api";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  await authenticate.admin(request);
+interface AuthContextValue {
+  token: string | null;
+  isLoading: boolean;
+  error: string | null;
+  retry: () => void;
+}
 
-  // eslint-disable-next-line no-undef
-  return { apiKey: process.env.SHOPIFY_API_KEY || "" };
+const AuthContext = createContext<AuthContextValue>({
+  token: null,
+  isLoading: true,
+  error: null,
+  retry: () => {},
+});
+
+export function useAuth(): AuthContextValue {
+  return useContext(AuthContext);
+}
+
+export const loader = async (_args: LoaderFunctionArgs) => {
+  return { apiKey };
 };
+
+declare global {
+  interface Window {
+    shopify?: {
+      idToken: () => Promise<string>;
+    };
+  }
+}
+
+/** SSR/首屏渲染稳定骨架,hydrate 后才挂 Polaris UI(自定义元素会破坏 hydration)。
+ *  注意:AppProvider 必须始终渲染(SSR 也要),App Bridge 脚本要在首屏 HTML 里才能连上 Shopify 父窗口。 */
+function useHydrated(): boolean {
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
+  return hydrated;
+}
+function waitForAppBridge(timeoutMs = 10000): Promise<Window["shopify"]> {
+  return new Promise((resolve, reject) => {
+    if (typeof window === "undefined") {
+      reject(new Error("Not in browser"));
+      return;
+    }
+    if (window.shopify) {
+      resolve(window.shopify);
+      return;
+    }
+    const start = Date.now();
+    const interval = setInterval(() => {
+      if (window.shopify) {
+        clearInterval(interval);
+        resolve(window.shopify);
+      } else if (Date.now() - start > timeoutMs) {
+        clearInterval(interval);
+        reject(new Error("App Bridge 加载超时"));
+      }
+    }, 100);
+  });
+}
+
+function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [token, setToken] = useState<string | null>(getToken());
+  const [isLoading, setIsLoading] = useState(!getToken());
+  const [error, setError] = useState<string | null>(null);
+
+  const performExchange = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const appBridge = await waitForAppBridge();
+      const sessionToken = await appBridge.idToken();
+      const jwt = await exchangeSessionToken(sessionToken);
+      setToken(jwt);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Authentication failed");
+      clearToken();
+      setToken(null);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!getToken()) {
+      performExchange();
+    }
+  }, [performExchange]);
+
+  if (isLoading) {
+    return (
+      <s-page>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "50vh",
+          }}
+        >
+          <s-spinner size="large" />
+        </div>
+      </s-page>
+    );
+  }
+
+  if (error || !token) {
+    return (
+      <s-page heading="Authentication Error">
+        <s-section>
+          <s-card>
+            <s-stack direction="block" gap="base">
+              <s-paragraph>无法通过 Shopify 认证。{error}</s-paragraph>
+              <s-button onClick={performExchange}>重试</s-button>
+            </s-stack>
+          </s-card>
+        </s-section>
+      </s-page>
+    );
+  }
+
+  return (
+    <AuthContext.Provider
+      value={{ token, isLoading, error, retry: performExchange }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
 
 export default function App() {
   const { apiKey } = useLoaderData<typeof loader>();
+  const hydrated = useHydrated();
 
   return (
     <AppProvider embedded apiKey={apiKey}>
-      <s-app-nav>
-        <s-link href="/app">Home</s-link>
-        <s-link href="/app/additional">Additional page</s-link>
-      </s-app-nav>
-      <Outlet />
+      {hydrated ? (
+        <>
+          <s-app-nav>
+            <s-link href="/app">Home</s-link>
+            <s-link href="/app/additional">Additional page</s-link>
+          </s-app-nav>
+          <AuthProvider>
+            <Outlet />
+          </AuthProvider>
+        </>
+      ) : (
+        <div style={{ padding: "2rem" }}>Loading…</div>
+      )}
     </AppProvider>
   );
 }
 
-// Shopify needs React Router to catch some thrown responses, so that their headers are included in the response.
 export function ErrorBoundary() {
   return boundary.error(useRouteError());
 }
 
-export const headers: HeadersFunction = (headersArgs) => {
+export const headers = (headersArgs: any) => {
   return boundary.headers(headersArgs);
 };
