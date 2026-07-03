@@ -1,0 +1,25 @@
+{
+  "$schema": "https://repomix.com/schemas/latest/schema.json",
+  "input": {
+    "maxFileSize": 52428800
+  },
+  "output": {
+    "filePath": "repomix-output.txt",
+    "style": "plain",
+    "topFilesLength": 10,
+    "headerText": "returnhelper-app（包名 returnfast）— Shopify 嵌入应用（React Router v7）。打包给 LLM 用。"
+  },
+  "include": [],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": [
+      "package-lock.json",
+      "pnpm-lock.yaml",
+      "build/",
+      "extensions/*/dist/",
+      "doc/shopify/"
+    ]
+  },
+  "securityCheck": true
+}

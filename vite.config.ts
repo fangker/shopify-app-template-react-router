@@ -37,7 +37,7 @@ if (host === "localhost") {
 
 export default defineConfig({
   server: {
-    allowedHosts: [host],
+    allowedHosts: [host, "shopify-local.cyanprobe.com"],
     cors: {
       preflightContinue: true,
     },

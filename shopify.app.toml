@@ -2,32 +2,31 @@
 
 client_id = "764c1374370c09e9e25003ac8235bf2b"
 name = "returnfast"
-application_url = "https://shopify.dev/apps/default-app-home"
+application_url = "https://avenue-franchise-girls-transaction.trycloudflare.com"
 embedded = true
 
 [build]
 automatically_update_urls_on_dev = true
-include_config_on_deploy = true
 
 [webhooks]
 api_version = "2026-07"
 
   [[webhooks.subscriptions]]
-  uri = "/webhooks/app/scopes_update"
-  topics = [ "app/scopes_update" ]
-
-  [[webhooks.subscriptions]]
   uri = "/webhooks/app/uninstalled"
   topics = [ "app/uninstalled" ]
 
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/app/scopes_update"
+  topics = [ "app/scopes_update" ]
+
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_products,write_products,read_orders,write_orders"
+scopes = "read_orders,read_products,write_orders,write_products,read_customers"
 
 [auth]
 redirect_urls = [
-  "https://controlled-ron-examination-baptist.trycloudflare.com/auth/callback",
-  "http://localhost:8001/auth/callback",
+  "https://avenue-franchise-girls-transaction.trycloudflare.com/auth/callback",
+  "http://localhost:8001/auth/callback"
 ]
 
 [product.metafields.app.demo_info]

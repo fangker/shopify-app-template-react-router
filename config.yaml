@@ -1,0 +1,8 @@
+tunnel: 807094fb-7a26-46b4-ae5f-35f8ee08809a
+credentials-file: /Users/cyan/.cloudflared/807094fb-7a26-46b4-ae5f-35f8ee08809a.json
+
+ingress:
+  - hostname: shopify-local.cyanprobe.com
+    service: http://localhost:3000
+  - service: http_status:404
+   

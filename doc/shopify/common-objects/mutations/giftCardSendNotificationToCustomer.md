@@ -1,0 +1,280 @@
+---
+title: giftCardSendNotificationToCustomer - GraphQL Admin
+description: |-
+  Sends a notification to the customer who purchased a gift card, including the
+  gift card details and code. The notification is delivered using the customer's
+  available contact method. Use this to resend the purchase confirmation or
+  remind the purchaser about a gift card they bought.
+api_version: 2026-07
+source_url:
+  html: >-
+    https://shopify.dev/docs/api/admin-graphql/latest/mutations/giftCardSendNotificationToCustomer
+  md: >-
+    https://shopify.dev/docs/api/admin-graphql/latest/mutations/giftCardSendNotificationToCustomer.md
+api_name: admin
+api_type: graphql
+type: mutation
+metadata:
+  domain: admin
+---
+
+# gift​Card​Send​Notification​To​Customer
+
+mutation
+
+Requires `write_gift_cards` access scope.
+
+Sends a notification to the customer who purchased a gift card, including the gift card details and code. The notification is delivered using the customer's available contact method. Use this to resend the purchase confirmation or remind the purchaser about a gift card they bought.
+
+## Arguments
+
+* id
+
+  [ID!](https://shopify.dev/docs/api/admin-graphql/latest/scalars/ID)
+
+  required
+
+  The ID of the gift card to send.
+
+***
+
+## Gift​Card​Send​Notification​To​Customer​Payload returns
+
+* gift​Card
+
+  [Gift​Card](https://shopify.dev/docs/api/admin-graphql/latest/objects/GiftCard)
+
+  The gift card that was sent.
+
+* user​Errors
+
+  [\[Gift​Card​Send​Notification​To​Customer​User​Error!\]!](https://shopify.dev/docs/api/admin-graphql/latest/objects/GiftCardSendNotificationToCustomerUserError)
+
+  non-null
+
+  The list of errors that occurred from executing the mutation.
+
+***
+
+## Examples
+
+* ### Send a notification to a gift card's customer
+
+  #### Query
+
+  ```graphql
+  mutation giftCardSendNotificationToCustomer($id: ID!) {
+    giftCardSendNotificationToCustomer(id: $id) {
+      giftCard {
+        id
+        customer {
+          id
+        }
+      }
+      userErrors {
+        message
+        field
+        code
+      }
+    }
+  }
+  ```
+
+  #### Variables
+
+  ```json
+  {
+    "id": "gid://shopify/GiftCard/698360200"
+  }
+  ```
+
+  #### cURL
+
+  ```bash
+  curl -X POST \
+  https://your-development-store.myshopify.com/admin/api/2026-07/graphql.json \
+  -H 'Content-Type: application/json' \
+  -H 'X-Shopify-Access-Token: {access_token}' \
+  -d '{
+  "query": "mutation giftCardSendNotificationToCustomer($id: ID!) { giftCardSendNotificationToCustomer(id: $id) { giftCard { id customer { id } } userErrors { message field code } } }",
+   "variables": {
+      "id": "gid://shopify/GiftCard/698360200"
+    }
+  }'
+  ```
+
+  #### React Router
+
+  ```javascript
+  import { authenticate } from "../shopify.server";
+
+  export const loader = async ({request}) => {
+    const { admin } = await authenticate.admin(request);
+    const response = await admin.graphql(
+      `#graphql
+    mutation giftCardSendNotificationToCustomer($id: ID!) {
+      giftCardSendNotificationToCustomer(id: $id) {
+        giftCard {
+          id
+          customer {
+            id
+          }
+        }
+        userErrors {
+          message
+          field
+          code
+        }
+      }
+    }`,
+    {
+      variables: {
+          "id": "gid://shopify/GiftCard/698360200"
+      },
+    },
+    );
+    const json = await response.json();
+    return json.data;
+  }
+  ```
+
+  #### Ruby
+
+  ```ruby
+  session = ShopifyAPI::Auth::Session.new(
+    shop: "your-development-store.myshopify.com",
+    access_token: access_token
+  )
+  client = ShopifyAPI::Clients::Graphql::Admin.new(
+    session: session
+  )
+
+  query = <<~QUERY
+    mutation giftCardSendNotificationToCustomer($id: ID!) {
+      giftCardSendNotificationToCustomer(id: $id) {
+        giftCard {
+          id
+          customer {
+            id
+          }
+        }
+        userErrors {
+          message
+          field
+          code
+        }
+      }
+    }
+  QUERY
+
+  variables = {
+    "id": "gid://shopify/GiftCard/698360200"
+  }
+
+  response = client.query(query: query, variables: variables)
+  ```
+
+  #### Node.js
+
+  ```javascript
+  const client = new shopify.clients.Graphql({session});
+  const data = await client.query({
+    data: {
+      "query": `mutation giftCardSendNotificationToCustomer($id: ID!) {
+        giftCardSendNotificationToCustomer(id: $id) {
+          giftCard {
+            id
+            customer {
+              id
+            }
+          }
+          userErrors {
+            message
+            field
+            code
+          }
+        }
+      }`,
+      "variables": {
+          "id": "gid://shopify/GiftCard/698360200"
+      },
+    },
+  });
+  ```
+
+  #### Shopify CLI
+
+  ```bash
+  shopify app execute \
+  --query \
+  'mutation giftCardSendNotificationToCustomer($id: ID!) {
+    giftCardSendNotificationToCustomer(id: $id) {
+      giftCard {
+        id
+        customer {
+          id
+        }
+      }
+      userErrors {
+        message
+        field
+        code
+      }
+    }
+  }' \
+  --variables \
+  '{
+    "id": "gid://shopify/GiftCard/698360200"
+  }'
+  ```
+
+  #### Direct API Access
+
+  ```javascript
+  const response = await fetch('shopify:admin/api/2026-07/graphql.json', {
+    method: 'POST',
+    body: JSON.stringify({
+      query: `
+        mutation giftCardSendNotificationToCustomer($id: ID!) {
+          giftCardSendNotificationToCustomer(id: $id) {
+            giftCard {
+              id
+              customer {
+                id
+              }
+            }
+            userErrors {
+              message
+              field
+              code
+            }
+          }
+        }
+      `,
+      variables: {
+          "id": "gid://shopify/GiftCard/698360200"
+      },
+    }),
+  });
+
+  const { data } = await response.json();
+  console.log(data);
+  ```
+
+  #### Response
+
+  ```json
+  {
+    "giftCardSendNotificationToCustomer": {
+      "giftCard": {
+        "id": "gid://shopify/GiftCard/698360200",
+        "customer": {
+          "id": "gid://shopify/Customer/649509010"
+        }
+      },
+      "userErrors": []
+    }
+  }
+  ```
+
+* ### giftCardSendNotificationToCustomer reference

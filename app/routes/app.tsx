@@ -107,18 +107,24 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <s-page>
+      <AuthContext.Provider
+        value={{ token: null, isLoading: true, error: null, retry: performExchange }}
+      >
+        {children}
         <div
           style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(255,255,255,0.75)",
             display: "flex",
-            justifyContent: "center",
             alignItems: "center",
-            minHeight: "50vh",
+            justifyContent: "center",
+            zIndex: 1000,
           }}
         >
           <s-spinner size="large" />
         </div>
-      </s-page>
+      </AuthContext.Provider>
     );
   }
 
