@@ -19,6 +19,11 @@ api_version = "2026-07"
   uri = "/webhooks/app/scopes_update"
   topics = [ "app/scopes_update" ]
 
+  # 订单缓存(服务买家门户离线校验):Remix catch-all(webhooks.$.tsx)转发给 Laravel 验签入库
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/shopify/orders"
+  topics = [ "orders/create", "orders/updated", "orders/cancelled" ]
+
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "read_orders,read_products,write_orders,write_products,read_customers"
