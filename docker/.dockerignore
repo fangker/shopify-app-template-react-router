@@ -1,0 +1,30 @@
+# 排除不进镜像的本地开发产物
+.git
+.github
+.gitignore
+.idea
+.vscode
+.DS_Store
+*.log
+*.tsbuildinfo
+
+# 本地配置/依赖
+.env
+.env.*
+!.env.example
+node_modules
+build
+
+# 测试/文档
+tests
+docs
+.claude
+Makefile
+makefile
+README.md
+*.md
+!docker/README.md
+
+# 调试
+.phpunit.result.cache
+.eslintcache
