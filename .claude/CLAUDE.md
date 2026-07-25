@@ -25,9 +25,9 @@ Shopify's public entrypoint is always the Remix app domain. Remix forwards OAuth
 
 | Environment | Shopify App | Config | Deploy |
 |---|---|---|---|
-| local | ReturnFast Local | `shopify.app.toml` | `npm run deploy` or `make dev-local` during dev |
-| dev | ReturnFast Dev | `shopify.app.dev.toml` | `make deploy-dev` |
-| prod | ReturnFast | `shopify.app.prod.toml` | `make deploy-prod` |
+| local | ReturnFast Local (`https://shopify-local.cyanprobe.com`) | `shopify.app.toml` | `npm run deploy` or `make dev-local` during dev |
+| dev | ReturnFast Dev (`https://dev-app.returnfast.net`) | `shopify.app.dev.toml` | `make deploy-dev` |
+| prod | ReturnFast (`https://app.returnfast.net`) | `shopify.app.prod.toml` | `make deploy-prod` |
 
 Rules:
 - `shopify.app.toml` is local only and must never point to dev or prod.
