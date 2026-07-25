@@ -7,20 +7,34 @@ Shopify Embedded App built with React Router v7, using a Laravel backend for OAu
 ```
 Shopify Admin (iframe)
   │
-  └── Cloudflare Tunnel (trycloudflare.com)
+  └── Remix App (React Router v7)
         │
-        └── Shopify CLI Proxy (port 57xxx)
-              │
-              ├── React Router Dev Server (port 57xxx)
-              │     └── Remix App (React Router v7)
-              │
-              └── Shopify Admin API (GraphiQL on port 3457)
+        ├── Local: fixed Cloudflare named tunnel (shopify-local.cyanprobe.com)
+        ├── Dev: stable dev app domain
+        └── Prod: stable production app domain
 
-Laravel Backend (port 8001) ← separate process, the auth & API server
+Laravel Backend ← separate process, the auth & API server
   ├── GET /auth               → Shopify OAuth entry
   ├── GET /auth/callback      → Shopify OAuth callback
   └── /api/shopify/*          → Shopify API (JWT-protected)
 ```
+
+Shopify's public entrypoint is always the Remix app domain. Remix forwards OAuth callbacks, webhooks, and `/api/shopify/*` requests to Laravel using `LARAVEL_API_URL`.
+
+## Shopify App Environments
+
+| Environment | Shopify App | Config | Deploy |
+|---|---|---|---|
+| local | ReturnFast Local | `shopify.app.toml` | `npm run deploy` or `make dev-local` during dev |
+| dev | ReturnFast Dev | `shopify.app.dev.toml` | `make deploy-dev` |
+| prod | ReturnFast | `shopify.app.prod.toml` | `make deploy-prod` |
+
+Rules:
+- `shopify.app.toml` is local only and must never point to dev or prod.
+- Dev/prod deploy commands must pass explicit `--config`.
+- Prod deploy must use `make deploy-prod`; it requires the exact confirmation phrase `deploy ReturnFast prod`.
+- Webhook `uri` values stay relative in Shopify config.
+- Shopify OAuth redirects always target Remix `/auth/callback`. Do not add Laravel `/auth/callback` URLs directly to Shopify redirect allowlists.
 
 ## Startup Sequence
 
@@ -36,33 +50,36 @@ php artisan serve --port=8001
 Config: `.env` — key variables:
 - `SHOPIFY_API_KEY` — from Shopify Partners
 - `SHOPIFY_API_SECRET` — from Shopify Partners
-- `REMIX_URL` — **must match current Cloudflare tunnel URL** (set by `shopify app dev`)
+- `REMIX_URL` — must match the current Remix app URL for the same environment
 
-### 2. Shopify App Dev (Remix + Tunnel)
+For each environment, these values must point to the same Shopify app/backend/database boundary:
+- Remix `SHOPIFY_API_KEY`
+- Laravel Shopify API key / secret
+- Remix `LARAVEL_API_URL`
+- Laravel `REMIX_URL`
+- Database credentials
+
+Do not mix local frontend with dev/prod Laravel, and do not let Laravel validate session tokens for a different Shopify app.
+
+### 2. Local Shopify App Dev (Remix + Fixed Tunnel)
 
 ```bash
 cd /Users/cyan/Desktop/lb/returnfast/returnfast-app
-shopify app dev
+make dev-local
 ```
 
 This starts:
-- Cloudflare tunnel → unique `*.trycloudflare.com` URL
-- Shopify CLI proxy
+- Cloudflare named tunnel → `https://shopify-local.cyanprobe.com`
+- Shopify CLI proxy using `--tunnel-url https://shopify-local.cyanprobe.com:3000`
 - React Router dev server
 
-Output includes:
-```
-Preview URL: https://admin.shopify.com/store/cyantest-iu8nhgtf/apps/764c1374370c09e9e25003ac8235bf2b?dev-console=show
-Using URL: https://xxx-xxx-xxx.trycloudflare.com
-```
+### 3. Sync Local Laravel URL
 
-### 3. Update REMIX_URL in Laravel
-
-Every `shopify app dev` restart generates a **new tunnel URL**. Must update:
+Local Laravel should use the fixed Remix URL:
 
 ```bash
 # Edit /Users/cyan/Desktop/lb/returnfast/returnfast/.env
-REMIX_URL=https://<new-tunnel-url>.trycloudflare.com
+REMIX_URL=https://shopify-local.cyanprobe.com
 
 # Then restart Laravel
 cd /Users/cyan/Desktop/lb/returnfast/returnfast
@@ -82,8 +99,8 @@ php artisan migrate
 |------|---------|-------|
 | 1. MySQL running | `docker ps` (if using Docker) | Port 3306 |
 | 2. Laravel started | `php artisan serve --port=8001` | Port 8001 |
-| 3. Shopify dev started | `shopify app dev` | Port 57xxx, tunnel URL |
-| 4. REMIX_URL synced | edit `.env` | matches tunnel URL |
+| 3. Shopify dev started | `make dev-local` | fixed `shopify-local.cyanprobe.com` tunnel |
+| 4. REMIX_URL synced | edit `.env` | `https://shopify-local.cyanprobe.com` |
 | 5. Laravel restarted | `php artisan optimize:clear && php artisan serve --port=8001` | Port 8001 |
 
 ## Auth Flow: App Bridge Session Token
@@ -158,9 +175,9 @@ new Response(JSON.stringify({ error: "..." }), { status: 400, headers: { "Conten
 
 Vite treats `foo.client.ts` as client-only and stubs it during SSR (exports become undefined → "is not a function" errors). Rename to avoid the `.client.` segment.
 
-### REMIX_URL out of sync with tunnel
+### REMIX_URL points at the wrong environment
 
-Every `shopify app dev` restart generates a new tunnel URL. Update `REMIX_URL` in `/Users/cyan/Desktop/lb/returnfast/returnfast/.env` and restart Laravel, or the OAuth redirect lands on a dead URL.
+`REMIX_URL`, Remix `SHOPIFY_API_KEY`, Remix `LARAVEL_API_URL`, Laravel Shopify credentials, and database credentials must all belong to the same environment. If OAuth or session token exchange fails, first check for cross-environment config mixing.
 
 ### 404 on Login button click
 
@@ -178,8 +195,8 @@ cd /Users/cyan/Desktop/lb/returnfast/returnfast && php artisan migrate
 
 ## Tunnel URL Management
 
-Each `shopify app dev` restart generates a new tunnel URL. Must update:
-1. `REMIX_URL` in `/Users/cyan/Desktop/lb/returnfast/returnfast/.env`
-2. Restart Laravel (`php artisan optimize:clear && php artisan serve --port=8001`)
+Local development uses the fixed Cloudflare named tunnel at `https://shopify-local.cyanprobe.com`.
 
-The manifest at `.shopify/dev-bundle/manifest.json` is auto-updated by the CLI.
+Dev and prod use stable deployed domains and do not use Shopify CLI tunnel workflows.
+
+The manifest at `.shopify/dev-bundle/manifest.json` is auto-updated by the CLI during local development.

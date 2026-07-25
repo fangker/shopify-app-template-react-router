@@ -1,8 +1,8 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "764c1374370c09e9e25003ac8235bf2b"
-name = "returnfast"
-application_url = "https://avenue-franchise-girls-transaction.trycloudflare.com"
+name = "ReturnFast Local"
+application_url = "https://shopify-local.cyanprobe.com"
 embedded = true
 
 [build]
@@ -30,8 +30,7 @@ scopes = "read_orders,read_products,write_orders,write_products,read_customers"
 
 [auth]
 redirect_urls = [
-  "https://avenue-franchise-girls-transaction.trycloudflare.com/auth/callback",
-  "http://localhost:8001/auth/callback"
+  "https://shopify-local.cyanprobe.com/auth/callback"
 ]
 
 [product.metafields.app.demo_info]
