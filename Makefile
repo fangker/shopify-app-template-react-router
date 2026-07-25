@@ -1,4 +1,4 @@
-# returnhelper-app Makefile
+# returnfast-app Makefile
 #
 # 本地开发:
 #   make dev   跑 Shopify CLI dev(本地需要 cloudflared tunnel)

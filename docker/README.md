@@ -1,4 +1,4 @@
-# returnhelper-app · Shopify 嵌入应用镜像构建
+# returnfast-app · Shopify 嵌入应用镜像构建
 
 镜像命名:
 
@@ -15,7 +15,7 @@ make docker_push_prod VERSION=1.2.3
 
 ## 在 K8s 中使用
 
-`returnhelper-app` Deployment 拉 `returnfast-app:dev`。容器跑 `react-router-serve ./build/server/index.js`,端口 3000。
+`returnfast-app` Deployment 拉 `returnfast-app:dev`。容器跑 `react-router-serve ./build/server/index.js`,端口 3000。
 
 生产环境**不需要** Cloudflare Tunnel(那是本地 dev 用);K8s 直接暴露 Service 给 Shopify 后台 iFrame 嵌入。
 

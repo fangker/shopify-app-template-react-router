@@ -7,7 +7,7 @@
     "filePath": "repomix-output.txt",
     "style": "plain",
     "topFilesLength": 10,
-    "headerText": "returnhelper-app（包名 returnfast）— Shopify 嵌入应用（React Router v7）。打包给 LLM 用。"
+    "headerText": "returnfast-app（包名 returnfast）— Shopify 嵌入应用（React Router v7）。打包给 LLM 用。"
   },
   "include": [],
   "ignore": {

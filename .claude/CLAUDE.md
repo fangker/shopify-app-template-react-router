@@ -1,4 +1,4 @@
-# returnhelper-app — Shopify Embedded App (React Router v7)
+# returnfast-app — Shopify Embedded App (React Router v7)
 
 Shopify Embedded App built with React Router v7, using a Laravel backend for OAuth and API.
 
@@ -29,7 +29,7 @@ Start services in order:
 ### 1. Laravel Backend
 
 ```bash
-cd /Users/cyan/Desktop/lb/returnhelper
+cd /Users/cyan/Desktop/lb/returnfast/returnfast
 php artisan serve --port=8001
 ```
 
@@ -41,7 +41,7 @@ Config: `.env` — key variables:
 ### 2. Shopify App Dev (Remix + Tunnel)
 
 ```bash
-cd /Users/cyan/Desktop/lb/returnhelper-app
+cd /Users/cyan/Desktop/lb/returnfast/returnfast-app
 shopify app dev
 ```
 
@@ -61,18 +61,18 @@ Using URL: https://xxx-xxx-xxx.trycloudflare.com
 Every `shopify app dev` restart generates a **new tunnel URL**. Must update:
 
 ```bash
-# Edit /Users/cyan/Desktop/lb/returnhelper/.env
+# Edit /Users/cyan/Desktop/lb/returnfast/returnfast/.env
 REMIX_URL=https://<new-tunnel-url>.trycloudflare.com
 
 # Then restart Laravel
-cd /Users/cyan/Desktop/lb/returnhelper
+cd /Users/cyan/Desktop/lb/returnfast/returnfast
 php artisan optimize:clear && php artisan serve --port=8001
 ```
 
 ### 4. Run DB Migrations (first time only)
 
 ```bash
-cd /Users/cyan/Desktop/lb/returnhelper
+cd /Users/cyan/Desktop/lb/returnfast/returnfast
 php artisan migrate
 ```
 
@@ -160,7 +160,7 @@ Vite treats `foo.client.ts` as client-only and stubs it during SSR (exports beco
 
 ### REMIX_URL out of sync with tunnel
 
-Every `shopify app dev` restart generates a new tunnel URL. Update `REMIX_URL` in `/Users/cyan/Desktop/lb/returnhelper/.env` and restart Laravel, or the OAuth redirect lands on a dead URL.
+Every `shopify app dev` restart generates a new tunnel URL. Update `REMIX_URL` in `/Users/cyan/Desktop/lb/returnfast/returnfast/.env` and restart Laravel, or the OAuth redirect lands on a dead URL.
 
 ### 404 on Login button click
 
@@ -169,7 +169,7 @@ React Router's `<Form>` intercepts external URL submissions. Use native `<form>`
 ### shops table not found
 
 ```bash
-cd /Users/cyan/Desktop/lb/returnhelper && php artisan migrate
+cd /Users/cyan/Desktop/lb/returnfast/returnfast && php artisan migrate
 ```
 
 ### JWTSubject error
@@ -179,7 +179,7 @@ cd /Users/cyan/Desktop/lb/returnhelper && php artisan migrate
 ## Tunnel URL Management
 
 Each `shopify app dev` restart generates a new tunnel URL. Must update:
-1. `REMIX_URL` in `/Users/cyan/Desktop/lb/returnhelper/.env`
+1. `REMIX_URL` in `/Users/cyan/Desktop/lb/returnfast/returnfast/.env`
 2. Restart Laravel (`php artisan optimize:clear && php artisan serve --port=8001`)
 
 The manifest at `.shopify/dev-bundle/manifest.json` is auto-updated by the CLI.

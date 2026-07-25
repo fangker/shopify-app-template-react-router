@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.6
-# returnhelper-app · Shopify 嵌入应用(Node 20 + React Router v7)
-# 用于 K8s deployment:returnhelper-app
+# returnfast-app · Shopify 嵌入应用(Node 20 + React Router v7)
+# 用于 K8s deployment:returnfast-app
 ARG NODE_VERSION=20.19-alpine
 
 # ─── stage 1: deps(完整,含 dev 依赖,build 阶段需要) ───────────────
