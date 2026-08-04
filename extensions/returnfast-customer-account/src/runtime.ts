@@ -50,6 +50,17 @@ export function getReturnPortalUrl(runtime: unknown = readShopifyRuntime()): str
   return getReturnPortalUrlFromContext(context);
 }
 
+export function readReturnPortalContextFromShopifyApi(api: unknown = readShopifyApi()): ReturnPortalContext {
+  const apiContext = readReturnPortalContext(api);
+  const targetContext = readReturnPortalContext(readShopifyRuntime(api));
+
+  return {
+    shop: targetContext.shop ?? apiContext.shop,
+    orderId: targetContext.orderId ?? apiContext.orderId,
+    email: targetContext.email ?? apiContext.email,
+  };
+}
+
 export function getReturnPortalUrlFromContext(context: ReturnPortalContext): string {
   return buildReturnPortalUrl({
     baseUrl: getReturnPortalBaseUrl(),

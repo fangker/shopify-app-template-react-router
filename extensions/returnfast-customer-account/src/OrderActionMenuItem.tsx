@@ -5,10 +5,9 @@ import { render } from "preact";
 import {
   getReturnPortalUrlFromContext,
   readShopifyApi,
+  readReturnPortalContextFromShopifyApi,
   readShopFromApiSessionToken,
-  readShopifyRuntime,
 } from "./runtime.js";
-import { readReturnPortalContext } from "./returnPortalUrl.js";
 
 function OrderActionMenuItem({ href }: { href: string }) {
   return <s-button href={href}>Start a return</s-button>;
@@ -16,8 +15,7 @@ function OrderActionMenuItem({ href }: { href: string }) {
 
 export default async function extension() {
   const shopifyApi = readShopifyApi();
-  const runtime = readShopifyRuntime(shopifyApi);
-  const context = readReturnPortalContext(runtime);
+  const context = readReturnPortalContextFromShopifyApi(shopifyApi);
 
   const href = getReturnPortalUrlFromContext({
     ...context,

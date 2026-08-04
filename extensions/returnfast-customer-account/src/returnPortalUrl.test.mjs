@@ -1,5 +1,9 @@
 import assert from "node:assert/strict";
-import { normalizeReturnPortalBaseUrl, readShopifyRuntime } from "../dist/runtime.js";
+import {
+  normalizeReturnPortalBaseUrl,
+  readReturnPortalContextFromShopifyApi,
+  readShopifyRuntime,
+} from "../dist/runtime.js";
 import {
   buildReturnPortalUrl,
   readShopFromSessionToken,
@@ -136,6 +140,23 @@ assert.deepEqual(
   {
     orderId: "gid://shopify/Order/999",
     customer: { value: { email: "target@example.com" } },
+  },
+);
+
+assert.deepEqual(
+  readReturnPortalContextFromShopifyApi({
+    orderId: "gid://shopify/Order/998",
+    shop: { domain: "api.myshopify.com" },
+    target: {
+      value: {
+        customer: { value: { email: "target@example.com" } },
+      },
+    },
+  }),
+  {
+    shop: "api.myshopify.com",
+    orderId: "gid://shopify/Order/998",
+    email: "target@example.com",
   },
 );
 

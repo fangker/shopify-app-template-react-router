@@ -2,8 +2,10 @@ import "@shopify/ui-extensions/preact";
 import type {} from "@shopify/ui-extensions/customer-account.order-status.block.render";
 import { render } from "preact";
 
-import { readReturnPortalContext } from "./returnPortalUrl.js";
-import { getReturnPortalUrlFromContext, readShopifyRuntime } from "./runtime.js";
+import {
+  getReturnPortalUrlFromContext,
+  readReturnPortalContextFromShopifyApi,
+} from "./runtime.js";
 
 function OrderStatusBlock({ href }: { href: string }) {
   return (
@@ -23,7 +25,7 @@ function OrderStatusBlock({ href }: { href: string }) {
 export default function extension() {
   render(
     <OrderStatusBlock
-      href={getReturnPortalUrlFromContext(readReturnPortalContext(readShopifyRuntime()))}
+      href={getReturnPortalUrlFromContext(readReturnPortalContextFromShopifyApi())}
     />,
     document.body,
   );
