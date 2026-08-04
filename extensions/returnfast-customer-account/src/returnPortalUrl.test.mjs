@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { normalizeReturnPortalBaseUrl } from "../dist/runtime.js";
 import {
   buildReturnPortalUrl,
+  readShopFromSessionToken,
   readReturnPortalContext,
 } from "../dist/returnPortalUrl.js";
 
@@ -108,3 +109,12 @@ assert.equal(
 
 assert.equal(normalizeReturnPortalBaseUrl("not a url"), "https://customer.returnfast.net");
 assert.equal(normalizeReturnPortalBaseUrl(""), "https://customer.returnfast.net");
+
+const sessionPayload = Buffer.from(
+  JSON.stringify({ dest: "https://demo.myshopify.com" }),
+).toString("base64url");
+
+assert.equal(
+  readShopFromSessionToken(`header.${sessionPayload}.signature`),
+  "demo.myshopify.com",
+);

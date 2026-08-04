@@ -1,11 +1,18 @@
 import "@shopify/ui-extensions/preact";
-import type {} from "@shopify/ui-extensions/customer-account.order.action.menu-item.render";
+import type { Api } from "@shopify/ui-extensions/customer-account.order.action.menu-item.render";
 import { render } from "preact";
 
-import { getReturnPortalUrl } from "./runtime.js";
+import { getReturnPortalUrlFromContext, readShopFromApiSessionToken } from "./runtime.js";
 
-function OrderActionMenuItem() {
-  return <s-button href={getReturnPortalUrl()}>Start a return</s-button>;
+function OrderActionMenuItem({ href }: { href: string }) {
+  return <s-button href={href}>Start a return</s-button>;
 }
 
-render(<OrderActionMenuItem />, document.body);
+export default async function extension(api: Api) {
+  const href = getReturnPortalUrlFromContext({
+    shop: await readShopFromApiSessionToken(api),
+    orderId: api.orderId,
+  });
+
+  render(<OrderActionMenuItem href={href} />, document.body);
+}

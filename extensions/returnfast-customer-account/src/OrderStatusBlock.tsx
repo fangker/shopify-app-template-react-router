@@ -1,17 +1,18 @@
 import "@shopify/ui-extensions/preact";
-import type {} from "@shopify/ui-extensions/customer-account.order-status.block.render";
+import type { Api } from "@shopify/ui-extensions/customer-account.order-status.block.render";
 import { render } from "preact";
 
-import { getReturnPortalUrl } from "./runtime.js";
+import { readReturnPortalContext } from "./returnPortalUrl.js";
+import { getReturnPortalUrlFromContext } from "./runtime.js";
 
-function OrderStatusBlock() {
+function OrderStatusBlock({ href }: { href: string }) {
   return (
     <s-section heading="ReturnFast">
       <s-stack gap="base">
         <s-paragraph color="subdued">
           Need to send something back? Start a return for this order.
         </s-paragraph>
-        <s-button href={getReturnPortalUrl()} variant="primary">
+        <s-button href={href} variant="primary">
           Request a return
         </s-button>
       </s-stack>
@@ -19,4 +20,9 @@ function OrderStatusBlock() {
   );
 }
 
-render(<OrderStatusBlock />, document.body);
+export default function extension(api: Api) {
+  render(
+    <OrderStatusBlock href={getReturnPortalUrlFromContext(readReturnPortalContext(api))} />,
+    document.body,
+  );
+}

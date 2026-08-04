@@ -1,6 +1,8 @@
 import {
   buildReturnPortalUrl,
   readReturnPortalContext,
+  readShopFromSessionToken,
+  type ReturnPortalContext,
 } from "./returnPortalUrl.js";
 
 const DEFAULT_RETURN_PORTAL_BASE_URL = "https://customer.returnfast.net";
@@ -34,9 +36,23 @@ export function readShopifyRuntime(): unknown {
 export function getReturnPortalUrl(runtime: unknown = readShopifyRuntime()): string {
   const context = readReturnPortalContext(runtime);
 
+  return getReturnPortalUrlFromContext(context);
+}
+
+export function getReturnPortalUrlFromContext(context: ReturnPortalContext): string {
   return buildReturnPortalUrl({
     baseUrl: getReturnPortalBaseUrl(),
     ...context,
     source: "shopify-account",
   });
+}
+
+export async function readShopFromApiSessionToken(api: unknown): Promise<string | undefined> {
+  const sessionToken = (api as { sessionToken?: { get?: () => Promise<string> } } | null)
+    ?.sessionToken;
+  if (typeof sessionToken?.get !== "function") {
+    return undefined;
+  }
+
+  return readShopFromSessionToken(await sessionToken.get());
 }

@@ -101,6 +101,33 @@ export function readReturnPortalContext(runtime: unknown): ReturnPortalContext {
   };
 }
 
+export function readShopFromSessionToken(token: unknown): string | undefined {
+  const value = cleanString(token);
+  if (!value) {
+    return undefined;
+  }
+
+  const [, payload] = value.split(".");
+  if (!payload) {
+    return undefined;
+  }
+
+  try {
+    const decoded = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/"))) as {
+      dest?: unknown;
+      iss?: unknown;
+    };
+    const dest = cleanString(decoded.dest) ?? cleanString(decoded.iss);
+    if (!dest) {
+      return undefined;
+    }
+
+    return dest.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  } catch {
+    return undefined;
+  }
+}
+
 export function buildReturnPortalUrl(input: ReturnPortalUrlInput): string {
   const url = new URL(input.baseUrl);
   const shop = cleanString(input.shop);

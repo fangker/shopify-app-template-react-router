@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build:helpers": "tsc src/returnPortalUrl.ts src/runtime.ts --noEmit false --outDir dist --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --skipLibCheck --types vite/client",
+    "build:helpers": "tsc src/returnPortalUrl.ts src/runtime.ts --noEmit false --outDir dist --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --skipLibCheck --types vite/client --lib DOM,ES2022",
     "test:url": "npm run build:helpers && node src/returnPortalUrl.test.mjs"
   },
   "dependencies": {
