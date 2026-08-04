@@ -22,9 +22,12 @@ export function normalizeReturnPortalBaseUrl(value: unknown): string {
 }
 
 export function getReturnPortalBaseUrl(): string {
-  return normalizeReturnPortalBaseUrl(
-    import.meta.env.VITE_RETURNFAST_CUSTOMER_PORTAL_URL,
-  );
+  return normalizeReturnPortalBaseUrl(readReturnPortalBaseUrlFromRuntimeEnv());
+}
+
+function readReturnPortalBaseUrlFromRuntimeEnv(): string | undefined {
+  return (import.meta as { env?: { VITE_RETURNFAST_CUSTOMER_PORTAL_URL?: string } }).env
+    ?.VITE_RETURNFAST_CUSTOMER_PORTAL_URL;
 }
 
 export function readShopifyApi(): unknown {
