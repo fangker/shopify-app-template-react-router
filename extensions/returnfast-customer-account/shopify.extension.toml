@@ -6,10 +6,33 @@ handle = "returnfast-customer-account"
 uid = "b4b5d5ab-3cef-1919-80ed-c30c98eee06a7be3d1fd"
 type = "ui_extension"
 
+[extensions.returnfast]
+customer_portal_url = "http://localhost:5173"
+
+[extensions.settings]
+
+[[extensions.settings.fields]]
+key = "customer_portal_url"
+type = "single_line_text_field"
+name = "Customer Portal URL"
+description = "URL for ReturnFast customer portal"
+
 [[extensions.targeting]]
 target = "customer-account.order.action.menu-item.render"
 module = "./src/OrderActionMenuItem.tsx"
 
 [[extensions.targeting]]
+target = "customer-account.order.action.render"
+module = "./src/OrderAction.tsx"
+
+[[extensions.targeting]]
+target = "customer-account.order-index.block.render"
+module = "./src/OrderIndexBlock.tsx"
+
+[[extensions.targeting]]
 target = "customer-account.order-status.block.render"
 module = "./src/OrderStatusBlock.tsx"
+
+[[extensions.targeting]]
+target = "customer-account.order-status.customer-information.render-after"
+module = "./src/OrderStatusCustomerInformation.tsx"

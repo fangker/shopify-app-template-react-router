@@ -4,8 +4,10 @@ import {
   readShopFromSessionToken,
   type ReturnPortalContext,
 } from "./returnPortalUrl.js";
+import { RETURNFAST_CUSTOMER_PORTAL_URL } from "./portalConfig.generated.js";
 
-const DEFAULT_RETURN_PORTAL_BASE_URL = "https://customer.returnfast.net";
+const DEFAULT_RETURN_PORTAL_BASE_URL = RETURNFAST_CUSTOMER_PORTAL_URL;
+const CUSTOMER_PORTAL_URL_SETTING_KEY = "customer_portal_url";
 
 export function normalizeReturnPortalBaseUrl(value: unknown): string {
   const configuredUrl = typeof value === "string" ? value.trim() : "";
@@ -22,12 +24,40 @@ export function normalizeReturnPortalBaseUrl(value: unknown): string {
 }
 
 export function getReturnPortalBaseUrl(): string {
-  return normalizeReturnPortalBaseUrl(readReturnPortalBaseUrlFromRuntimeEnv());
+  return normalizeReturnPortalBaseUrl(readReturnPortalBaseUrlFromShopifySettings());
 }
 
-function readReturnPortalBaseUrlFromRuntimeEnv(): string | undefined {
-  return (import.meta as { env?: { VITE_RETURNFAST_CUSTOMER_PORTAL_URL?: string } }).env
-    ?.VITE_RETURNFAST_CUSTOMER_PORTAL_URL;
+export function readReturnPortalBaseUrlFromShopifySettings(
+  api: unknown = readShopifyApi(),
+): string | undefined {
+  return readSettingValue(api, CUSTOMER_PORTAL_URL_SETTING_KEY);
+}
+
+export function readSettingValue(api: unknown, key: string): string | undefined {
+  const settings = (api as { settings?: unknown } | null)?.settings;
+  const source = readSignalValue(settings);
+
+  if (source === null || typeof source !== "object") {
+    return undefined;
+  }
+
+  const value = (source as Record<string, unknown>)[key];
+
+  return typeof value === "string" ? value : undefined;
+}
+
+export function readSignalValue(signal: unknown): unknown {
+  if (signal === null || typeof signal !== "object") {
+    return undefined;
+  }
+
+  const source = signal as {
+    value?: unknown;
+    current?: unknown;
+    currentValue?: unknown;
+  };
+
+  return source.value ?? source.current ?? source.currentValue;
 }
 
 export function readShopifyApi(): unknown {
