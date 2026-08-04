@@ -11,6 +11,7 @@
 #   make docker_build_prod      仅构建不推送
 
 ROOT := $(CURDIR)
+SHOPIFY := npm exec shopify --
 
 REGISTRY    := registry.cn-hangzhou.aliyuncs.com
 REGISTRY_NS := rx-prod
@@ -28,13 +29,13 @@ dev-local:
 	@cloudflared --config config.yaml tunnel run shopify-local & \
 	tunnel_pid=$$!; \
 	trap "kill $$tunnel_pid 2>/dev/null" INT TERM; \
-	shopify app dev --tunnel-url https://shopify-local.cyanprobe.com:3000; \
+	$(SHOPIFY) app dev --tunnel-url https://shopify-local.cyanprobe.com:3000; \
 	status=$$?; \
 	kill $$tunnel_pid 2>/dev/null; \
 	exit $$status
 
 deploy-dev:
-	shopify app deploy --config dev
+	$(SHOPIFY) app deploy --config dev
 
 deploy-prod:
 	@echo "Target config: prod"
@@ -50,7 +51,7 @@ deploy-prod:
 		echo "Aborted."; \
 		exit 1; \
 	fi
-	shopify app deploy --config prod
+	$(SHOPIFY) app deploy --config prod
 
 ## ───── Docker 镜像(生产部署) ─────────────────────────────────────
 
