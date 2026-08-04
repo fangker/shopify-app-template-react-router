@@ -3,6 +3,7 @@ api_version = "2026-07"
 [[extensions]]
 name = "ReturnFast Returns"
 handle = "returnfast-customer-account"
+uid = "b4b5d5ab-3cef-1919-80ed-c30c98eee06a7be3d1fd"
 type = "ui_extension"
 
 [[extensions.targeting]]
