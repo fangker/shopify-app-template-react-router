@@ -13,6 +13,7 @@ export type ReturnPortalContext = {
 };
 
 type PathSegment = string | number;
+type CandidatePath = PathSegment[];
 
 export function cleanString(value: unknown): string | undefined {
   if (typeof value !== "string" && typeof value !== "number") {
@@ -48,11 +49,55 @@ export function readPath(source: unknown, path: PathSegment[]): unknown {
   return current;
 }
 
+function readFirstString(source: unknown, paths: CandidatePath[]): string | undefined {
+  for (const path of paths) {
+    const value = cleanString(readPath(source, path));
+
+    if (value) {
+      return value;
+    }
+  }
+
+  return undefined;
+}
+
+function readFirstEmail(source: unknown, paths: CandidatePath[]): string | undefined {
+  for (const path of paths) {
+    const value = cleanEmail(readPath(source, path));
+
+    if (value) {
+      return value;
+    }
+  }
+
+  return undefined;
+}
+
 export function readReturnPortalContext(runtime: unknown): ReturnPortalContext {
   return {
-    shop: cleanString(readPath(runtime, ["shop", "myshopifyDomain"])),
-    orderId: cleanString(readPath(runtime, ["order", "current", "name"])),
-    email: cleanEmail(readPath(runtime, ["customer", "current", "email"])),
+    shop: readFirstString(runtime, [
+      ["shop", "myshopifyDomain"],
+      ["shop", "domain"],
+      ["shop", "current", "myshopifyDomain"],
+      ["shop", "current", "domain"],
+      ["shop", "currentValue", "myshopifyDomain"],
+      ["shop", "currentValue", "domain"],
+    ]),
+    orderId: readFirstString(runtime, [
+      ["orderId"],
+      ["order", "current", "name"],
+      ["order", "currentValue", "name"],
+      ["order", "current", "id"],
+      ["order", "currentValue", "id"],
+    ]),
+    email: readFirstEmail(runtime, [
+      ["buyerIdentity", "email", "current"],
+      ["buyerIdentity", "email", "currentValue"],
+      ["buyerIdentity", "customer", "current", "email"],
+      ["buyerIdentity", "customer", "currentValue", "email"],
+      ["customer", "current", "email"],
+      ["customer", "currentValue", "email"],
+    ]),
   };
 }
 
@@ -68,7 +113,7 @@ export function buildReturnPortalUrl(input: ReturnPortalUrlInput): string {
   }
 
   if (orderId) {
-    url.searchParams.set("order", orderId);
+    url.searchParams.set("orderId", orderId);
   }
 
   if (email) {
