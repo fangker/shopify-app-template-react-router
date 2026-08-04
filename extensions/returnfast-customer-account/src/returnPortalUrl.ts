@@ -82,21 +82,28 @@ export function readReturnPortalContext(runtime: unknown): ReturnPortalContext {
       ["shop", "current", "domain"],
       ["shop", "currentValue", "myshopifyDomain"],
       ["shop", "currentValue", "domain"],
+      ["shop", "value", "myshopifyDomain"],
+      ["shop", "value", "domain"],
     ]),
     orderId: readFirstString(runtime, [
       ["orderId"],
       ["order", "current", "name"],
       ["order", "currentValue", "name"],
+      ["order", "value", "name"],
       ["order", "current", "id"],
       ["order", "currentValue", "id"],
+      ["order", "value", "id"],
     ]),
     email: readFirstEmail(runtime, [
       ["buyerIdentity", "email", "current"],
       ["buyerIdentity", "email", "currentValue"],
+      ["buyerIdentity", "email", "value"],
       ["buyerIdentity", "customer", "current", "email"],
       ["buyerIdentity", "customer", "currentValue", "email"],
+      ["buyerIdentity", "customer", "value", "email"],
       ["customer", "current", "email"],
       ["customer", "currentValue", "email"],
+      ["customer", "value", "email"],
     ]),
   };
 }

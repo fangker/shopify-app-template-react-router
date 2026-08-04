@@ -83,6 +83,19 @@ assert.deepEqual(
 
 assert.deepEqual(
   readReturnPortalContext({
+    shop: { value: { domain: "demo.myshopify.com" } },
+    order: { value: { name: "#1005" } },
+    buyerIdentity: { email: { value: "value-signal@example.com" } },
+  }),
+  {
+    shop: "demo.myshopify.com",
+    orderId: "#1005",
+    email: "value-signal@example.com",
+  },
+);
+
+assert.deepEqual(
+  readReturnPortalContext({
     shop: { current: { myshopifyDomain: "demo.myshopify.com" } },
     order: { current: { id: "gid://shopify/Order/789" } },
     buyerIdentity: {
