@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { normalizeReturnPortalBaseUrl } from "../dist/runtime.js";
+import { normalizeReturnPortalBaseUrl, readShopifyRuntime } from "../dist/runtime.js";
 import {
   buildReturnPortalUrl,
   readShopFromSessionToken,
@@ -122,6 +122,22 @@ assert.equal(
 
 assert.equal(normalizeReturnPortalBaseUrl("not a url"), "https://customer.returnfast.net");
 assert.equal(normalizeReturnPortalBaseUrl(""), "https://customer.returnfast.net");
+
+assert.deepEqual(
+  readShopifyRuntime({
+    sessionToken: { get: async () => "" },
+    target: {
+      value: {
+        orderId: "gid://shopify/Order/999",
+        customer: { value: { email: "target@example.com" } },
+      },
+    },
+  }),
+  {
+    orderId: "gid://shopify/Order/999",
+    customer: { value: { email: "target@example.com" } },
+  },
+);
 
 const sessionPayload = Buffer.from(
   JSON.stringify({ dest: "https://demo.myshopify.com" }),

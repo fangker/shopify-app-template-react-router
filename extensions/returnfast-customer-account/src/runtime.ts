@@ -27,10 +27,21 @@ export function getReturnPortalBaseUrl(): string {
   );
 }
 
-export function readShopifyRuntime(): unknown {
-  // Current Customer Account Preact stubs mount via document.body; Shopify exposes
-  // the target API on globalThis.shopify in that runtime.
+export function readShopifyApi(): unknown {
   return (globalThis as { shopify?: unknown }).shopify;
+}
+
+export function readShopifyRuntime(api: unknown = readShopifyApi()): unknown {
+  // Current Customer Account Preact stubs mount via document.body; Shopify exposes
+  // the full API on globalThis.shopify and target-specific data on shopify.target.value.
+  const shopify = api as { target?: unknown } | null;
+  return (
+    (shopify?.target &&
+      typeof shopify.target === "object" &&
+      "value" in shopify.target &&
+      (shopify.target as { value?: unknown }).value) ||
+    api
+  );
 }
 
 export function getReturnPortalUrl(runtime: unknown = readShopifyRuntime()): string {
