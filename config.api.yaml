@@ -1,0 +1,10 @@
+# Local dev: dedicated tunnel for the Laravel API host.
+# Separate from config.yaml so shopify-local.cyanprobe.com stays app-only and
+# api-local.returnfast.net stays backend-only.
+tunnel: 53cd9182-42a4-4ad0-aab7-01b01e5a861b
+credentials-file: /Users/cyan/.cloudflared/53cd9182-42a4-4ad0-aab7-01b01e5a861b.json
+
+ingress:
+  - hostname: api-local.returnfast.net
+    service: http://localhost:8001
+  - service: http_status:404

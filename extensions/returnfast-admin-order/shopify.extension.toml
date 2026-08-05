@@ -1,0 +1,23 @@
+api_version = "2026-07"
+
+[[extensions]]
+name = "ReturnFast Return Toggle"
+handle = "returnfast-admin-order"
+uid = "8aeb7bc7-3781-7430-a279-6204198b68e38f9cd3ca"
+type = "ui_extension"
+
+[extensions.returnfast]
+laravel_api_url = "https://api-local.returnfast.net"
+
+[extensions.settings]
+
+[[extensions.settings.fields]]
+key = "laravel_api_url"
+type = "single_line_text_field"
+name = "Laravel API URL"
+description = "URL for ReturnFast Laravel API"
+
+[[extensions.targeting]]
+# §12.2 verify: confirm exact Admin Order Detail target name against current Shopify Admin UI extension list.
+target = "admin.order-details.block.render"
+module = "./src/OrderReturnToggle.tsx"

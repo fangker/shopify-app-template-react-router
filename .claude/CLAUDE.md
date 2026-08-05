@@ -103,37 +103,31 @@ php artisan migrate
 | 4. REMIX_URL synced | edit `.env` | `https://shopify-local.cyanprobe.com` |
 | 5. Laravel restarted | `php artisan optimize:clear && php artisan serve --port=8001` | Port 8001 |
 
-## Auth Flow: App Bridge Session Token
+## Auth Flow: ReturnFast JWT From Shopify Session Token
 
-The app uses Shopify App Bridge Session Tokens (NOT cookies). Two distinct flows:
+The app uses Shopify runtime session tokens only as exchange credentials. Laravel
+issues scoped ReturnFast JWTs, and Shopify access tokens stay only in Laravel.
 
-### Normal Auth (every page load)
+### Normal Auth
 
 ```
 Shopify Admin (iframe)
-  │ App Bridge injects session token (JWT signed by Shopify)
+  │ App Bridge session token
   ▼
-app.tsx AuthProvider (client)
-  │ const shopify = useAppBridge()   // from @shopify/app-bridge-react
-  │ const sessionToken = await shopify.getSessionToken()
-  │ POST /api/auth/token { session_token }
+app.tsx AuthProvider / extension runtime
+  │ sessionStorage lookup by returnfast:{shop}:admin|customer:access
+  │ cache miss or expired → sessionToken.get()/idToken()
   ▼
-api.auth.token.tsx (Remix action)
-  │ POST http://127.0.0.1:8001/api/shopify/auth/exchange { session_token }
+Laravel
+  │ POST /api/shopify/admin/session/exchange
+  │ POST /api/shopify/customer/session/exchange
   ▼
-Laravel ShopifyAuthController::exchange()
-  │ verifies Shopify session token signature (against Shopify public keys)
-  │ looks up shop by `dest` claim
-  │ returns { data: { token: "<laravel_jwt>" } }
+ReturnFast JWT { typ:returnfast_shopify_access, scope:shopify_admin|shopify_customer }
   ▼
-Remix returns { token } → stored in memory (laravel-api.ts)
-  ▼
-Subsequent API calls via apiFetch() → Authorization: Bearer <laravel_jwt>
+Direct Laravel API calls with Authorization: Bearer <returnfast_jwt>
 ```
 
-API calls from the browser go through Remix proxy routes (browser can't reach Laravel directly):
-- `POST /api/auth/token` → Laravel `/api/shopify/auth/exchange` (no auth)
-- `/api/shopify/*` → Laravel `/api/shopify/*` (forwards `Authorization` header)
+Remix is not a business API gateway. Keep OAuth callback proxy support only.
 
 ### First-time Install (OAuth, one-time)
 
@@ -142,7 +136,7 @@ Only used when a merchant first installs the app (acquires permanent `access_tok
 2. Shopify callback → `/auth/callback` (Remix) → Laravel `GET /auth/callback`
 3. Laravel stores `access_token` in `shops` table, redirects back
 
-The JWT is stored in memory only (`laravel-api.ts`), never in `localStorage` or cookies.
+The ReturnFast JWT is stored in `sessionStorage`, never in `localStorage` or cookies.
 
 ## Key Files
 
@@ -150,11 +144,14 @@ The JWT is stored in memory only (`laravel-api.ts`), never in `localStorage` or 
 |------|------|
 | `app/routes/app.tsx` | App layout + AuthProvider (session token exchange, AuthContext) |
 | `app/routes/app._index.tsx` | Dashboard page (client-side fetch via apiFetch) |
-| `app/routes/api.auth.token.tsx` | POST proxy: session token → Laravel JWT |
-| `app/routes/api.shopify.$.tsx` | Catch-all proxy: `/api/shopify/*` → Laravel (with auth) |
+| `app/routes/app.settings.tsx` | Embedded settings page (default return toggle + reconnect) |
+| `app/shared/shopify-auth/token-manager.ts` | sessionStorage token cache, refresh lock, exchange |
+| `app/shared/shopify-auth/api-client.ts` | Direct Laravel API client with bearer JWT and one retry |
+| `extensions/returnfast-admin-order/src/OrderReturnToggle.tsx` | Admin order detail return toggle extension |
+| `extensions/returnfast-customer-account/src/returnPermission.ts` | Customer extension permission exchange/check |
 | `app/routes/auth.login/route.tsx` | First-time install form (OAuth) |
 | `app/routes/auth.callback.tsx` | OAuth callback proxy to Laravel |
-| `app/lib/laravel-api.ts` | Client API: in-memory JWT, exchangeSessionToken, apiFetch |
+| `app/lib/laravel-api.ts` | Embedded App admin API wrapper around shared ReturnFast JWT client |
 | `app/lib/laravel.server.ts` | Server-side fetchApi (for webhooks) |
 | `app/shopify.server.ts` | Shopify API key export |
 | `shopify.app.toml` | App config (redirect URLs, scopes) |

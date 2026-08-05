@@ -10,8 +10,10 @@
     "pretypecheck": "npm run generate:portal-config",
     "typecheck": "tsc --noEmit",
     "prebuild:helpers": "npm run generate:portal-config",
-    "build:helpers": "tsc src/returnPortalUrl.ts src/runtime.ts src/portalConfig.generated.ts --noEmit false --outDir dist --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --skipLibCheck --types vite/client --lib DOM,ES2022",
-    "test:url": "npm run build:helpers && node src/returnPortalUrl.test.mjs"
+    "build:helpers": "tsc src/returnPortalUrl.ts src/runtime.ts src/returnPermission.ts src/portalConfig.generated.ts --noEmit false --outDir dist --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --skipLibCheck --types vite/client --lib DOM,ES2022",
+    "test:url": "npm run build:helpers && node src/returnPortalUrl.test.mjs",
+    "test:permission": "npm run build:helpers && node src/returnPermission.test.mjs",
+    "test:runtime": "npm run build:helpers && node src/runtime.test.mjs"
   },
   "dependencies": {
     "@preact/signals": "^2.3.0",

@@ -80,7 +80,7 @@ export default function Index() {
       setLoading(true);
       setError(null);
       try {
-        const data = await apiFetch<ShopData>("/api/shopify/me");
+        const data = await apiFetch<ShopData>("/api/shopify/admin/me");
         if (cancelled) return;
         if (!data) {
           setError("会话已过期，请刷新页面。");
@@ -192,23 +192,23 @@ export default function Index() {
         <s-card>
           <s-stack direction="block" gap="base">
             <s-paragraph>
-              <s-text fontWeight="bold">Shop:</s-text> {shop.shop_domain}
+              <strong>Shop:</strong> {shop.shop_domain}
             </s-paragraph>
             <s-paragraph>
-              <s-text fontWeight="bold">Name:</s-text> {shop.name || "—"}
+              <strong>Name:</strong> {shop.name || "—"}
             </s-paragraph>
             <s-paragraph>
-              <s-text fontWeight="bold">Owner:</s-text> {shop.shop_owner || "—"}
+              <strong>Owner:</strong> {shop.shop_owner || "—"}
             </s-paragraph>
             <s-paragraph>
-              <s-text fontWeight="bold">Email:</s-text> {shop.email || "—"}
+              <strong>Email:</strong> {shop.email || "—"}
             </s-paragraph>
             <s-paragraph>
-              <s-text fontWeight="bold">Customer Email:</s-text>{" "}
+              <strong>Customer Email:</strong>{" "}
               {shop.customer_email || "—"}
             </s-paragraph>
             <s-paragraph>
-              <s-text fontWeight="bold">Phone:</s-text> {shop.phone || "—"}
+              <strong>Phone:</strong> {shop.phone || "—"}
             </s-paragraph>
           </s-stack>
         </s-card>
@@ -218,28 +218,28 @@ export default function Index() {
         <s-card>
           <s-stack direction="block" gap="base">
             <s-paragraph>
-              <s-text fontWeight="bold">Address:</s-text>{" "}
+              <strong>Address:</strong>{" "}
               {[shop.address1, shop.city, shop.zip, shop.country]
                 .filter(Boolean)
                 .join(", ") || "—"}
             </s-paragraph>
             <s-paragraph>
-              <s-text fontWeight="bold">Timezone:</s-text>{" "}
+              <strong>Timezone:</strong>{" "}
               {shop.iana_timezone || shop.timezone || "—"}
             </s-paragraph>
             <s-paragraph>
-              <s-text fontWeight="bold">Primary Locale:</s-text>{" "}
+              <strong>Primary Locale:</strong>{" "}
               {shop.primary_locale || "—"}
             </s-paragraph>
             <s-paragraph>
-              <s-text fontWeight="bold">Currency:</s-text>{" "}
+              <strong>Currency:</strong>{" "}
               {shop.currency || "—"}
               {shop.money_with_currency_format
                 ? ` (${shop.money_with_currency_format})`
                 : ""}
             </s-paragraph>
             <s-paragraph>
-              <s-text fontWeight="bold">Weight Unit:</s-text>{" "}
+              <strong>Weight Unit:</strong>{" "}
               {shop.weight_unit || "—"}
             </s-paragraph>
           </s-stack>
@@ -250,33 +250,33 @@ export default function Index() {
         <s-card>
           <s-stack direction="block" gap="base">
             <s-paragraph>
-              <s-text fontWeight="bold">Plan:</s-text> {shop.plan}
+              <strong>Plan:</strong> {shop.plan}
               {shop.plan_display_name
                 ? ` (${shop.plan_display_name})`
                 : ""}
             </s-paragraph>
             <s-paragraph>
-              <s-text fontWeight="bold">Domain:</s-text>{" "}
+              <strong>Domain:</strong>{" "}
               {shop.domain || shop.myshopify_domain || "—"}
             </s-paragraph>
             <s-paragraph>
-              <s-text fontWeight="bold">Shop ID:</s-text>{" "}
+              <strong>Shop ID:</strong>{" "}
               {shop.shopify_shop_id ?? "—"}
             </s-paragraph>
             <s-paragraph>
-              <s-text fontWeight="bold">Installed:</s-text>{" "}
+              <strong>Installed:</strong>{" "}
               {shop.installed_at
                 ? new Date(shop.installed_at).toLocaleString()
                 : "—"}
             </s-paragraph>
             <s-paragraph>
-              <s-text fontWeight="bold">Created:</s-text>{" "}
+              <strong>Created:</strong>{" "}
               {shop.created_at
                 ? new Date(shop.created_at).toLocaleString()
                 : "—"}
             </s-paragraph>
             <s-paragraph>
-              <s-text fontWeight="bold">Updated:</s-text>{" "}
+              <strong>Updated:</strong>{" "}
               {shop.updated_at
                 ? new Date(shop.updated_at).toLocaleString()
                 : "—"}

@@ -1,9 +1,6 @@
 import assert from "node:assert/strict";
 import {
   normalizeReturnPortalBaseUrl,
-  readReturnPortalBaseUrlFromShopifySettings,
-  readSettingValue,
-  readSignalValue,
   readReturnPortalContextFromShopifyApi,
   readShopifyRuntime,
 } from "../dist/runtime.js";
@@ -129,26 +126,6 @@ assert.equal(
 
 assert.equal(normalizeReturnPortalBaseUrl("not a url"), "http://localhost:5173");
 assert.equal(normalizeReturnPortalBaseUrl(""), "http://localhost:5173");
-
-assert.equal(
-  readSignalValue({ value: { customer_portal_url: "http://localhost:5173" } }).customer_portal_url,
-  "http://localhost:5173",
-);
-
-assert.equal(
-  readSettingValue(
-    { settings: { current: { customer_portal_url: "http://localhost:5173" } } },
-    "customer_portal_url",
-  ),
-  "http://localhost:5173",
-);
-
-assert.equal(
-  readReturnPortalBaseUrlFromShopifySettings({
-    settings: { value: { customer_portal_url: "http://localhost:5173" } },
-  }),
-  "http://localhost:5173",
-);
 
 assert.deepEqual(
   readShopifyRuntime({

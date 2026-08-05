@@ -13,8 +13,7 @@ import { AppProvider } from "@shopify/shopify-app-react-router/react";
 import { apiKey } from "../shopify.server";
 import {
   clearToken,
-  exchangeSessionToken,
-  getToken,
+  adminTokenManager,
 } from "../lib/laravel-api";
 
 interface AuthContextValue {
@@ -78,8 +77,8 @@ function waitForAppBridge(timeoutMs = 10000): Promise<Window["shopify"]> {
 }
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [token, setToken] = useState<string | null>(getToken());
-  const [isLoading, setIsLoading] = useState(!getToken());
+  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const performExchange = useCallback(async () => {
@@ -87,8 +86,8 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     setError(null);
     try {
       const appBridge = await waitForAppBridge();
-      const sessionToken = await appBridge.idToken();
-      const jwt = await exchangeSessionToken(sessionToken);
+      if (!appBridge?.idToken) throw new Error("App Bridge idToken unavailable");
+      const jwt = await adminTokenManager.getAccessToken();
       setToken(jwt);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Authentication failed");
@@ -100,9 +99,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!getToken()) {
-      performExchange();
-    }
+    performExchange();
   }, [performExchange]);
 
   if (isLoading) {
@@ -162,7 +159,7 @@ export default function App() {
         <>
           <s-app-nav>
             <s-link href="/app">Home</s-link>
-            <s-link href="/app/additional">Additional page</s-link>
+            <s-link href="/app/settings">Settings</s-link>
           </s-app-nav>
           <AuthProvider>
             <Outlet />

@@ -7,9 +7,13 @@
     "config:link": "npm exec shopify -- app config link",
     "generate": "npm exec shopify -- app generate",
     "deploy": "npm exec shopify -- app deploy",
-    "deploy:local-extension": "npm run --workspace returnfast-customer-account generate:portal-config:local && npm exec shopify -- app deploy --allow-updates",
-    "deploy:dev-extension": "npm run --workspace returnfast-customer-account generate:portal-config:dev && npm exec shopify -- app deploy --config dev --allow-updates",
-    "deploy:prod-extension": "npm run --workspace returnfast-customer-account generate:portal-config:prod && npm exec shopify -- app deploy --config prod --allow-updates",
+    "sync:extension-config": "node scripts/sync-extension-config.mjs",
+    "sync:extension-config:local": "node scripts/sync-extension-config.mjs local",
+    "sync:extension-config:dev": "node scripts/sync-extension-config.mjs dev",
+    "sync:extension-config:prod": "node scripts/sync-extension-config.mjs prod",
+    "deploy:local-app": "npm run sync:extension-config:local && npm exec shopify -- app deploy --allow-updates",
+    "deploy:dev-app": "npm run sync:extension-config:dev && npm exec shopify -- app deploy --config dev --allow-updates",
+    "deploy:prod-app": "npm run sync:extension-config:prod && npm exec shopify -- app deploy --config prod --allow-updates",
     "deploy:dev": "npm exec shopify -- app deploy --config dev",
     "deploy:prod": "make deploy-prod",
     "config:use": "npm exec shopify -- app config use",
@@ -20,7 +24,8 @@
     "shopify": "npm exec shopify --",
     "graphql-codegen": "graphql-codegen",
     "vite": "vite",
-    "typecheck": "react-router typegen && tsc --noEmit"
+    "typecheck": "react-router typegen && tsc --noEmit",
+    "test:shopify-auth": "npm exec esbuild -- app/shared/shopify-auth/token-manager.test.ts --bundle --platform=node --format=esm --outfile=/tmp/returnfast-shopify-auth-test.mjs && node /tmp/returnfast-shopify-auth-test.mjs"
   },
   "type": "module",
   "engines": {

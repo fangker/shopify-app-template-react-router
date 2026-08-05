@@ -26,12 +26,14 @@ dev: dev-local
 
 ## Shopify CLI dev(启动 Cloudflare Tunnel + shopify app dev)
 dev-local:
-	@cloudflared --config config.yaml tunnel run shopify-local & \
-	tunnel_pid=$$!; \
-	trap "kill $$tunnel_pid 2>/dev/null" INT TERM; \
+	@cloudflared --config config.yaml tunnel run shopify-local >/tmp/cloudflared-shopify-local.log 2>&1 & \
+	app_tunnel_pid=$$!; \
+	cloudflared --config config.api.yaml tunnel run api-local-returnfast >/tmp/cloudflared-api-local-returnfast.log 2>&1 & \
+	api_tunnel_pid=$$!; \
+	trap "kill $$app_tunnel_pid $$api_tunnel_pid 2>/dev/null" INT TERM; \
 	$(SHOPIFY) app dev --tunnel-url https://shopify-local.cyanprobe.com:3000; \
 	status=$$?; \
-	kill $$tunnel_pid 2>/dev/null; \
+	kill $$app_tunnel_pid $$api_tunnel_pid 2>/dev/null; \
 	exit $$status
 
 deploy-dev:
