@@ -16,7 +16,10 @@ async function forward(
   splat: string | undefined,
 ): Promise<Response> {
   const url = new URL(request.url);
-  const target = `${LARAVEL_API_URL}/webhooks/${splat ?? ""}${url.search}`;
+  const targetPath = splat === "shopify/public"
+    ? "/api/webhooks/shopify/public"
+    : `/webhooks/${splat ?? ""}`;
+  const target = `${LARAVEL_API_URL}${targetPath}${url.search}`;
 
   // 透传 Shopify 头 + content-type(其余如 Host/Content-Length 由 fetch 自管)
   const headers: Record<string, string> = {};
